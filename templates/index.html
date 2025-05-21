@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI - UI</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .container {
+          display: flex;
+          justify-content: space-between;
+          width: 800px;
+          gap: 20px;
+        }
+
+        .panel {
+          border: 2px solid #ccc;
+          border-radius: 10px;
+          background-color: white;
+          padding: 20px;
+          width: 45%;
+        }
+
+        .panel h3 {
+          margin-top: 0px;
+          text-align: center;
+        }
+
+        .command h3 {
+          margin-top: 0px;
+          text-align: center;
+        }
+
+        .buttons {
+          display: grid;
+          grid-template-columns: repeat(3, 100px);
+          grid-gap: 15px;
+          justify-content: center;
+          margin: 20px 0;
+        }
+
+        .buttons button {
+          display: inline-block;
+          padding: 12px 12px;
+          font-size: 16px;
+          border-radius: 8px;
+          cursor: auto;
+          white-space: nowrap;
+          background-color: transparent;
+        }
+
+        #printBtn { border: 4px solid green; }
+        #scanBtn { border: 4px solid blue; }
+        #copyBtn { border: 4px solid orange; }
+        #publishBtn {
+          grid-column: span 3;
+          border: 4px solid #3399ff;
+        }
+
+        .record-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        #recordBtn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #ff4444;
+            background-color: transparent;
+            color: #ff4444;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #recordBtn:hover {
+            background-color: #ff4444;
+            color: white;
+        }
+
+        #recordBtn:active {
+            transform: scale(0.95);
+        }
+
+        .files {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          text-align: center;
+        }
+
+        .file {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          font-size: 15px;
+        }
+
+        .file img {
+          width: 60px;
+          height: 60px;
+          object-fit: contain;
+        }
+
+        .command {
+          flex-direction: column;
+          display: flex;
+          width: 800px;
+          border: 2px solid #ccc;
+          border-radius: 10px;
+          padding: 20px;
+          border-radius: 8px;
+          background-color: white;
+          align-items: center;
+        }
+
+        #command, #text {
+            width: 80%;
+            min-height: 50px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background-color: #555;
+            color: white;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel">
+      <h3>Printer Interface</h3>
+      <div class="buttons">
+        <button id="printBtn">Print</button>
+        <button id="scanBtn">Scan</button>
+        <button id="copyBtn">Copy</button>
+        <button id="publishBtn">Publish to Cloud</button>
+      </div>
+        <div class="record-container">
+            <button id="recordBtn">Rec</button>
+        </div>
+    </div>
+    <div class="panel">
+      <h3>Files on the Desktop</h3>
+      <div class="files">
+        <div class="file"><img src="/static/icons/pdf_icon.png" alt="PDF"><span>Contract.pdf</span></div>
+        <div class="file"><img src="/static/icons/pdf_icon.png" alt="PDF"><span>ID.pdf</span></div>
+        <div class="file"><img src="/static/icons/png_icon.png" alt="PNG"><span>Photo_1.png</span></div>
+        <div class="file"><img src="/static/icons/jpg_icon.png" alt="JPG"><span>Demo.jpg</span></div>
+        <div class="file"><img src="/static/icons/pdf_icon.png" alt="PDF"><span>1234.pdf</span></div>
+        <div class="file"><img src="/static/icons/jpg_icon.png" alt="JPG"><span>Mountains.jpg</span></div>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+      <div class="command">
+          <h3>Raw text</h3>
+          <div id="text"></div>
+      </div>
+  </div>
+  <div class="container">
+      <div class="command">
+          <h3>The command for Hardware</h3>
+          <div id="command"></div>
+      </div>
+  </div>
+    <!-- Scripts -->
+    <script>
+        const recordBtn = document.getElementById('recordBtn');
+        const commandDiv = document.getElementById('command');
+        const textDiv = document.getElementById('text');
+        let mediaRecorder;
+        let audioChunks = [];
+
+        recordBtn.addEventListener('click', async () => {
+            if (!mediaRecorder) {
+                await startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    await sendToBackend(audioBlob);
+                };
+
+                mediaRecorder.start();
+                recordBtn.textContent = 'Stop';
+                textDiv.textContent = 'Recording...';
+            } catch (err) {
+                textDiv.textContent = 'Error: ' + err.message;
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                mediaRecorder = null;
+                recordBtn.textContent = 'Rec';
+            }
+        }
+
+        async function sendToBackend(audioBlob) {
+            textDiv.textContent = 'Sending to server...';
+
+            try {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.webm');
+
+                const response = await fetch('http://localhost:7777/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                commandDiv.textContent = result.text || '';
+                textDiv.textContent = result.rawText || 'Try again';
+            } catch (error) {
+                textDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
