@@ -10,15 +10,10 @@ brew install ffmpeg
 ```
 
 ```bash
-pip install flask flask-cors openai-whisper ffmpeg-python sentence-transformers
+pip install -r requirements.txt
 ```
 
 **Run the Backend**:
 ```bash
 python app.py
-```
-
-**Serve the Frontend**:
-```bash
-python -m http.server 8888
 ```
