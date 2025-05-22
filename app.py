@@ -28,7 +28,7 @@ class ActionMatcher:
                 "template": "Print {file_name}"
             },
             "publish": {
-                "patterns": ["publish to cloud", "upload"],
+                "patterns": ["publish to cloud", "publish", "upload"],
                 "files": {
                     "Photo_1.png": ["photo one", "photo 1", "photo one picture", "first image", "initial picture"],
                     "Contract.pdf": ["contract", "contract pdf", "agreement document", "legal paper"],
