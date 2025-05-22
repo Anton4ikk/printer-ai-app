@@ -18,11 +18,11 @@ class ActionMatcher:
             "print": {
                 "patterns": ["print", "generate hard copy"],
                 "files": {
-                    "Photo_1.png": ["photo one", "photo one picture", "first image", "initial picture"],
+                    "Photo_1.png": ["photo one", "photo 1", "photo one picture", "first image", "initial picture"],
                     "Contract.pdf": ["contract", "contract pdf", "agreement document", "legal paper"],
-                    "ID.pdf": ["id", "identification document", "identity card"],
-                    "Demo.jpg": ["demo", "demo picture", "demo photo", "demonstration photo", "example image"],
-                    "1234.pdf": ["one two three four", "document 1234", "four numbers"],
+                    "ID.pdf": ["id", "id pdf", "id document", "identification document", "identity card"],
+                    "Demo.jpg": ["demo", "demo picture", "demo photo", "demonstration photo", "demonstration picture", "example image"],
+                    "1234.pdf": ["one two three four", "1234", "1234 pdf", "1234 document", "document 1234", "four numbers"],
                     "Mountains.jpg": ["mountains", "mountains picture", "mountains photo", "mountain view", "landscape photo"]
                 },
                 "template": "Print {file_name}"
@@ -30,11 +30,11 @@ class ActionMatcher:
             "publish": {
                 "patterns": ["publish to cloud", "upload"],
                 "files": {
-                    "Photo_1.png": ["photo one", "photo one picture", "first image", "initial picture"],
+                    "Photo_1.png": ["photo one", "photo 1", "photo one picture", "first image", "initial picture"],
                     "Contract.pdf": ["contract", "contract pdf", "agreement document", "legal paper"],
-                    "ID.pdf": ["id", "identification document", "identity card"],
-                    "Demo.jpg": ["demo", "demo picture", "demo photo", "demonstration photo", "example image"],
-                    "1234.pdf": ["one two three four", "document 1234", "four numbers"],
+                    "ID.pdf": ["id", "id pdf", "id document", "identification document", "identity card"],
+                    "Demo.jpg": ["demo", "demo picture", "demo photo", "demonstration photo", "demonstration picture", "example image"],
+                    "1234.pdf": ["one two three four", "1234", "1234 pdf", "1234 document", "document 1234", "four numbers"],
                     "Mountains.jpg": ["mountains", "mountains picture", "mountains photo", "mountain view", "landscape photo"]
                 },
                 "template": "Publish {file_name} to cloud"
@@ -195,4 +195,5 @@ def transcribe():
                 os.unlink(path)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=7777)
+    app.run(ssl_context=('certs/cert.pem', 'certs/key.pem'), host='0.0.0.0', port=7777)
+    # app.run(host='0.0.0.0', port=7777)
