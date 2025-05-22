@@ -216,6 +216,7 @@
                 mediaRecorder.start();
                 recordBtn.textContent = 'Stop';
                 textDiv.textContent = 'Recording...';
+                commandDiv.textContent = '';
             } catch (err) {
                 textDiv.textContent = 'Error: ' + err.message;
             }

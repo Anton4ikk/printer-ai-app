@@ -23,7 +23,7 @@ class ActionMatcher:
                     "ID.pdf": ["id", "id pdf", "id document", "identification document", "identity card"],
                     "Demo.jpg": ["demo", "demo picture", "demo photo", "demonstration photo", "demonstration picture", "example image"],
                     "1234.pdf": ["one two three four", "1234", "1234 pdf", "1234 document", "document 1234", "four numbers"],
-                    "Mountains.jpg": ["mountains", "mountains picture", "mountains photo", "mountain view", "landscape photo"]
+                    "Mountains.jpg": ["mountains", "mountain", "mountains picture", "mountains photo", "mountain view", "landscape photo"]
                 },
                 "template": "Print {file_name}"
             },
@@ -53,7 +53,6 @@ class ActionMatcher:
         self.file_references = defaultdict(list)
         self.file_mappings = defaultdict(dict)
         self.file_embeddings = {}
-
         self._precompute_embeddings()
 
     def _precompute_embeddings(self):
@@ -94,7 +93,6 @@ class ActionMatcher:
 
         text_embedding = self.model.encode(text, convert_to_tensor=True)
         cos_scores = util.cos_sim(text_embedding, self.action_embeddings)[0]
-
         best_score_idx = cos_scores.argmax().item()
         score = cos_scores[best_score_idx].item()  # Convert to Python float
 
@@ -108,7 +106,6 @@ class ActionMatcher:
 
         text_embedding = self.model.encode(text, convert_to_tensor=True)
         cos_scores = util.cos_sim(text_embedding, self.file_embeddings[action])[0]
-
         best_score_idx = cos_scores.argmax().item()
         score = cos_scores[best_score_idx].item()  # Convert to Python float
 
@@ -124,10 +121,11 @@ class ActionMatcher:
             return {"error": "No matching action found"}
 
         output = self.actions[action]["template"]
-
         if "files" in self.actions[action]:
             filename, file_conf = self._match_reference(action, text, file_threshold)
             try:
+                if not filename:
+                    return {"error": "Could not determine file for action '{}'".format(action)}
                 output = output.format(file_name=filename)
             except KeyError:
                 return {"error": f"Template formatting error for {filename}"}
@@ -161,15 +159,13 @@ def transcribe():
         with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp_output:
             output_path = tmp_output.name
 
-        cmd = [
-            'ffmpeg',
+        cmd = ['ffmpeg',
             '-i', input_path,
             '-acodec', 'pcm_s16le',
             '-ac', '1',
             '-ar', '16000',
             '-y',
-            output_path
-        ]
+            output_path]
         subprocess.run(cmd, check=True, capture_output=True)
         transcription_result = model.transcribe(output_path)
         transcript_text = transcription_result.get('text', '').strip()
@@ -182,7 +178,6 @@ def transcribe():
 
         matcher = ActionMatcher()
         result = matcher.process(transcription_result['text'])
-
         return jsonify({"text": result['output'], "rawText": transcription_result['text']})
 
     except subprocess.CalledProcessError as e:
