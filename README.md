@@ -30,9 +30,6 @@ brew install ffmpeg
 ```
 **2. Install Dependencies**:
 ```bash
-source venv/bin/activate
-```
-```bash
 pip install -r requirements.txt
 ```
 **3. Run the App**:
