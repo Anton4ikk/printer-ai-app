@@ -118,7 +118,7 @@ class ActionMatcher:
     def process(self, text, action_threshold=0.6, file_threshold=0.5):
         action, action_conf = self._find_action(text, action_threshold)
         if not action:
-            return {"error": "No matching action found"}
+            return {"output": "No matching action found"}
 
         output = self.actions[action]["template"]
         if "files" in self.actions[action]:
@@ -127,9 +127,9 @@ class ActionMatcher:
                 if filename:
                     output = output.format(file_name=filename)
                 else:
-                    return {"error": "No file matched for action: {}".format(action)}
+                    return {"output": "No file matched for action: {}".format(action)}
             except KeyError:
-                return {"error": f"Template formatting error for {filename}"}
+                return {"output": f"Template formatting error for {filename}"}
 
             return {
                 "action": action,
@@ -182,9 +182,9 @@ def transcribe():
         return jsonify({"text": result['output'], "rawText": transcription_result['text']})
 
     except subprocess.CalledProcessError as e:
-        return jsonify({"error": f"Audio conversion failed: {e.stderr.decode()}"}), 500
+        return jsonify({"text": f"Audio conversion failed: {e.stderr.decode()}"}), 500
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"text": str(e)}), 500
     finally:
         for path in [input_path, output_path]:
             if path and os.path.exists(path):
