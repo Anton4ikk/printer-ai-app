@@ -237,7 +237,7 @@
                 const formData = new FormData();
                 formData.append('audio', audioBlob, 'recording.webm');
 
-                const response = await fetch(https://89.111.174.83:7777/transcribe', {
+                const response = await fetch('https://89.111.174.83:7777/transcribe', {
                 // const response = await fetch('http://localhost:7777/transcribe', {
                     method: 'POST',
                     body: formData
