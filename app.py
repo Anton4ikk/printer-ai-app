@@ -124,9 +124,10 @@ class ActionMatcher:
         if "files" in self.actions[action]:
             filename, file_conf = self._match_reference(action, text, file_threshold)
             try:
-                if not filename:
-                    return {"error": "Could not determine file for action '{}'".format(action)}
-                output = output.format(file_name=filename)
+                if filename:
+                    output = output.format(file_name=filename)
+                else:
+                    return {"error": "No file matched for action: {}".format(action)}
             except KeyError:
                 return {"error": f"Template formatting error for {filename}"}
 
